@@ -1,0 +1,31 @@
+FROM quay.io/centos/centos:stream9
+
+RUN dnf -y update && \
+    dnf -y install \
+        sudo \
+        openssh-server \
+        bash \
+        python3 \
+        procps-ng \
+        iputils && \
+    dnf clean all
+
+
+RUN ssh-keygen -A
+
+RUN useradd -m -s /bin/bash ansible && \
+    echo "ansible:ansible" | chpasswd && \
+    usermod -aG wheel ansible
+
+RUN echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible && \
+    chmod 440 /etc/sudoers.d/ansible
+
+RUN sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+WORKDIR /home/ansible
+
+COPY start-centos.sh .
+RUN chmod +x ./start-centos.sh
+EXPOSE 22
+
+CMD ["./start-centos.sh"]

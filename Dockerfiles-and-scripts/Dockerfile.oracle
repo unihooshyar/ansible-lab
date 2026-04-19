@@ -1,0 +1,35 @@
+FROM oraclelinux:9
+
+RUN dnf install -y \
+    sudo \
+    python3 \
+    openssh-server \
+    vim \
+    iputils \
+    passwd \
+    && dnf clean all
+
+# Create SSH runtime dir
+RUN mkdir -p /var/run/sshd
+
+# Generate SSH host keys (IMPORTANT)
+RUN ssh-keygen -A
+
+# Create ansible user
+RUN useradd -m -s /bin/bash ansible && \
+    echo "ansible:ansible" | chpasswd && \
+    usermod -aG wheel ansible
+
+# Passwordless sudo (RHEL-style)
+RUN echo "%wheel ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/wheel && \
+    chmod 440 /etc/sudoers.d/wheel
+
+# Enable SSH password authentication
+RUN sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+EXPOSE 22
+
+WORKDIR /home/ansible
+
+CMD ["/usr/sbin/sshd", "-D"]

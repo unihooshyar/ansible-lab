@@ -1,0 +1,17 @@
+- name: Ensure admin group exists
+  group:
+    name: "{{ admin_group }}"
+    state: present
+
+- name: Create admin user
+  user:
+    name: "{{ admin_user }}"
+    shell: /bin/bash
+    groups: "{{ admin_group }}"
+    state: present
+  when: create_admin_user
+
+# - name: Add SSH key for admin user
+#   authorized_key:
+#    user: "{{ admin_user }}"
+#    key: "{{ admin_ssh_key }}"

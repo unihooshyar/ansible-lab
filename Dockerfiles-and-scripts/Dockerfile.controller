@@ -1,0 +1,31 @@
+FROM ubuntu:22.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    curl \
+    sudo \
+    openssh-server \
+    python3 \
+    python3-pip \
+    ansible \
+    openssh-client \
+    sshpass \
+    vim \
+    wget \
+    tmux \
+    ncurses-term \
+    iputils-ping \
+    && mkdir /var/run/sshd \
+    && apt-get clean
+RUN wget -O /usr/local/bin/ttyd \
+        https://github.com/tsl0922/ttyd/releases/latest/download/ttyd.x86_64 \
+    && chmod +x /usr/local/bin/ttyd
+
+RUN useradd -m -s /bin/bash ansible && \
+    echo "ansible:ansible" | chpasswd && \
+    usermod -aG sudo ansible
+WORKDIR /home/ansible
+
+COPY start.sh .
+RUN chmod +x ./start.sh
+
+CMD ["./start.sh"]

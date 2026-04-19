@@ -1,0 +1,10 @@
+
+
+- name: Setup users
+  import_tasks: users.yml
+
+- name: Install baseline packages
+  import_tasks: packages.yml
+
+- name: Set system timezone
+  import_tasks: timezone.yml

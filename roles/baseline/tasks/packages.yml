@@ -1,0 +1,26 @@
+- name: Install debian specific packages
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - software-properties-common
+      - tzdata
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install redhat specific packages
+  dnf:
+    name:
+      - dnf-utils
+      - policycoreutils-python-utils
+    state: present
+  when: ansible_facts['distribution'] in ["Rocky", "CentOS", "OracleLinux"]
+
+- name: Install Suse specific packages
+  zypper:
+    name:
+      - curl
+      - vim
+      - git
+    state: present
+  when: ansible_os_family == "Suse"

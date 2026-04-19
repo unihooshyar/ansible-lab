@@ -1,0 +1,32 @@
+FROM opensuse/leap:15.5
+
+RUN zypper --non-interactive refresh && \
+    zypper --non-interactive install \
+        sudo \
+        python3 \
+        openssh \
+        vim \
+        iputils \
+        shadow \
+    && zypper clean
+
+# SSH runtime directory
+RUN mkdir -p /var/run/sshd
+RUN ssh-keygen -A
+# Create ansible user
+RUN useradd -m -s /bin/bash ansible && \
+    echo "ansible:ansible" | chpasswd
+
+# Passwordless sudo
+RUN echo "ansible ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/ansible && \
+    chmod 440 /etc/sudoers.d/ansible
+
+# Enable SSH password authentication
+RUN sed -i 's/^#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+EXPOSE 22
+
+WORKDIR /home/ansible
+
+CMD ["/usr/sbin/sshd", "-D"]

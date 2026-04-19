@@ -1,0 +1,4 @@
+create_admin_user: true
+admin_user: root
+
+timezone: Europe/Berlin
