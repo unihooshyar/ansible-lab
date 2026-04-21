@@ -1,0 +1,10 @@
+galaxy_info: 
+  role_name: system_hardening
+  author: Ali Hooshyar
+  description: A role to enforce system hardening policies
+  company: Ansible Lab
+  license: MIT
+  min_ansible_version: "12.4"
+dependencies: []
+
+

@@ -1,0 +1,35 @@
+- name: Set minimum password length
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^minlen'
+    line: 'minlen = 12'
+
+- name: Require at least one digit
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^dcredit'
+    line: 'dcredit = -1'
+
+- name: Require uppercase
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^ucredit'
+    line: 'ucredit = -1'
+
+- name: Require lowercase
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^lcredit'
+    line: 'lcredit = -1'
+
+- name: Require special character
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^ocredit'
+    line: 'ocredit = -1'
+
+- name: Set retry attempts
+  lineinfile:
+    path: /etc/security/pwquality.conf
+    regexp: '^retry'
+    line: 'retry = 3'

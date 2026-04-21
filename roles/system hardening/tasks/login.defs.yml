@@ -1,0 +1,48 @@
+- name: set password aging policy
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MAX_DAYS'
+    line: 'PASS_MAX_DAYS  90'
+
+- name: set password min age
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MIN_DAYS'
+    line: 'PASS_MIN_DAYS  7'
+
+- name: set password warning age
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_WARN_AGE'
+    line: 'PASS_WARN_AGE  14'
+
+- name: set password min length
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^PASS_MIN_LEN'
+    line: 'PASS_MIN_LEN  12'
+
+- name: set UID_MIN
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^UID_MIN'
+    line: 'UID_MIN 1000'
+
+- name: set UID_MAX
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^UID_MAX'
+    line: 'UID_MAX 60000'
+
+- name: Login retry limit
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^LOGIN_RETRIES'
+    line: 'LOGIN_RETRIES 3'
+
+- name: Login timeout
+  lineinfile:
+    path: /etc/login.defs
+    regexp: '^LOGIN_TIMEOUT'
+    line: 'LOGIN_TIMEOUT 60'
+

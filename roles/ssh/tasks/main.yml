@@ -15,32 +15,38 @@
   loop: "{{ ssh_users }}"
   when: item.create_user | default(true)
 
-- name: Ensure local key directory exists
+- name: Ensure local SSH directory exists (controller)
   delegate_to: localhost
-  file:
-    path: "/home/ansible/.ssh"
-    state: directory
-    mode: '0700'
   run_once: true
+  become: true
+  become_user: ansible
+  file:
+    path: /home/ansible/.ssh
+    state: directory
+    owner: ansible
+    group: ansible
+    mode: '0700'
 
-- name: Generate SSH key pairs for users
+- name: Generate SSH keypairs for users (controller)
   delegate_to: localhost
+  run_once: true
+  become: true
+  become_user: ansible
   openssh_keypair:
     path: "/home/ansible/.ssh/{{ item.name }}"
-    type: rsa
-    size: 2048
+    type: ed25519
     force: false
+    regenerate: never
   loop: "{{ ssh_users }}"
-  run_once: true
 
-- name: Ensure .ssh directory exists
+- name: Ensure .ssh directory exists on nodes
   file:
     path: "/home/{{ item.name }}/.ssh"
     state: directory
-    owner: "{{ item.name}}"
+    owner: "{{ item.name }}"
     group: "{{ item.name }}"
     mode: '0700'
-  loop: "{{ ssh_users }}" 
+  loop: "{{ ssh_users }}"
   when: item.create_user | default(true)
 
 - name: Install authorized keys
@@ -55,6 +61,7 @@
   file:
     path: "/home/{{ item.name }}/.ssh/authorized_keys"
     owner: "{{ item.name }}"
+    group: "{{ item.name }}"
     mode: '0600'
   loop: "{{ ssh_users }}"
   when: item.create_user | default(true)
@@ -65,3 +72,25 @@
     regexp: '^#?PasswordAuthentication'
     line: 'PasswordAuthentication no'
   notify: reload ssh
+
+- name: Generate SSH client config for users
+  delegate_to: localhost
+  run_once: true
+  become: true
+  become_user: ansible
+  blockinfile:
+    path: /home/ansible/.ssh/config
+    create: yes
+    mode: '0600'
+    marker: "# {mark} ANSIBLE MANAGED BLOCK - SSH USERS"
+    block: |
+      {% for host in groups['all'] %}
+      {% for user in ssh_users %}
+      Host {{ host }}-{{ user.name }}
+          HostName {{ host }}
+          User {{ user.name }}
+          IdentityFile /home/ansible/.ssh/{{ user.name }}
+          IdentitiesOnly yes
+
+      {% endfor %}
+      {% endfor %}

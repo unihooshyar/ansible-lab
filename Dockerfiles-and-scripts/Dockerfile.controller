@@ -23,9 +23,18 @@ RUN wget -O /usr/local/bin/ttyd \
 RUN useradd -m -s /bin/bash ansible && \
     echo "ansible:ansible" | chpasswd && \
     usermod -aG sudo ansible
+
+RUN chown -R ansible:ansible /home/ansible && \
+    mkdir -p /home/ansible/.ssh && \
+    chown -R ansible:ansible /home/ansible/.ssh && \
+    chmod 700 /home/ansible/.ssh
+    
+
 WORKDIR /home/ansible
 
-COPY start.sh .
-RUN chmod +x ./start.sh
+COPY start.sh /home/ansible/start.sh
+RUN chmod 755 /home/ansible/start.sh
 
-CMD ["./start.sh"]
+USER ansible
+
+CMD ["/home/ansible/start.sh"]

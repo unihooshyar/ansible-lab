@@ -1,0 +1,16 @@
+- name: disable root ssh
+  import_tasks: ssh-hardening.yml
+  tags: ssh_hardening
+
+- name: set login policies
+  import_tasks: login.defs.yml
+  tags: login_policies
+
+- name: set PAM policies
+  import_tasks: PAM-policies.yml
+  tags: PAM_policies
+
+- name: set PAM policies for Rocky Linux
+  import_tasks: PAM-policies-rocky.yml
+  when: ansible_distribution == "Rocky"
+  tags: PAM_policies
